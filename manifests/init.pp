@@ -68,7 +68,8 @@ define etc_services (
   }
 
   augeas { "${service_name}_${protocol}":
-    context => '/files/etc/services',
+    incl    => '/etc/services',
+    lens    => 'Services.lns',
     changes => $augeas_operations
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "ccin2p3-etc_services",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "source": "https://github.com/ccin2p3/puppet-etc_services",
   "author": "IN2P3 Computing Centre",
   "license": "CeCILL B",
