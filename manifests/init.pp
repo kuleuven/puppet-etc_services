@@ -3,46 +3,56 @@
 #
 # Contributor(s) : Remi Ferrand <remi.ferrand_at_cc(dot)in2p3(dot)fr>
 #
-# == Define: etc_services
-#
 # @summary Manage a /etc/services entry uniquely identified by its name and protocol.
-#
-# === Parameters
 #
 # @param service_name [String]
 #   The name of the service in /etc/services. This is a namevar...
+#   Note that it must comply with the syntax laid out in 
+#   [RFC 6335 Section 5.1](https://tools.ietf.org/html/rfc6335#section-5.1)
 #
-# @param ports
-#   /etc/services entry port. Required.
+# @param protocols [Hash[Enum['tcp','udp'],Integer]]
+#   A hash mapping one or more protocols to their associated ports. This is
+#   mandatory.
 #
-# @param comment
-#   /etc/services entry comment. Defaults to ''.
+# @param comment [String]
+#   An optional comment to be appended to the end of each port/protocol
+#   specific line in /etc/services.
 #
-# @param aliases
-#   /etc/services entry aliases specified as an array. Defaults to [].
+# @param aliases [Array[String]]
+#   An optional array of aliases which will be included for each port/protocol
+#   combination in /etc/services.
 #
-# @param ensure
-#   Should /etc/services entry be present or absent. Defaults to present.
+# @param ensure [Enum['absent','present']]
+#   Should the corresponding /etc/services entry/entries be present or absent?
 #
 define etc_services (
-  String $service_name = $name,
-  Enum['absent','present'] $ensure = 'present',
-  String $comment = '',
-  Array[String] $aliases = [],
-  Array[Pattern[/^\d+\/(tcp|udp)$/]] $ports = [],
+  String  $service_name = $name,
+  Enum['absent','present'] $ensure           = 'present',
+  String $comment                            = '',
+  Array[String] $aliases                     = [],
+  Hash[Enum['tcp','udp'],Integer] $protocols = undef,
 )
 {
+  # Validate the name per RFC 6335 section 5.1
+  # 1-15 characters
+  # Begins and ends with [A-Za-z0-9]
+  # Includes only [A-Za-z0-9-]
+  # No consecutive '-'
+  unless($service_name =~
+    /^(?=.{1,15}$)(?=[A-Za-z0-9])(?=[A-Za-z0-9-]*[A-Za-z0-9]$)(?!.*([-])\1)[A-Za-z0-9-]+$/) {
+    fail("etc_service: Invalid service name '${service_name}'")
+  }
+  $aliases.each | $alias | {
+    unless($alias =~
+      /^(?=.{1,15}$)(?=[A-Za-z0-9])(?=[A-Za-z0-9-]*[A-Za-z0-9]$)(?!.*([-])\1)[A-Za-z0-9-]+$/) {
+      fail("etc_services: Invalid service alias '${alias}'")
+    }
+  }
 
-  $protocol = $primary_keys[1]
-
-  if ($ensure == 'present') {
-    $ports.each | $port_tuple | {
-      $primary_keys = split($port_tuple, '/')
-      $port = $primary_keys[0]
-      $protocol = $primary_keys[1]
-
+  # For each port/protocol combination
+  $protocols.each | $protocol, $port | {
+    if ($ensure == 'present') {
       $augeas_alias_operations = prefix($aliases, 'set $node/alias[last()+1] ')
-
       $augeas_pre_alias_operations = [
         "defnode node service-name[.='${service_name}'][protocol = '${protocol}'] ${service_name}",
         "set \$node/port ${port}",
@@ -65,18 +75,16 @@ define etc_services (
         $augeas_post_alias_operations
       ])
     }
-  }
-  else {
-    $augeas_operations = [
-      "remove service-name[.='${service_name}'][protocol = '${protocol}'] ${service_name}"
-    ]
-  }
+    else {
+      $augeas_operations = [
+        "remove service-name[.='${service_name}'][protocol = '${protocol}'] ${service_name}"
+      ]
+    }
 
-  augeas { "${service_name}_${protocol}":
-    incl    => '/etc/services',
-    lens    => 'Services.lns',
-    changes => $augeas_operations
+    augeas { "${service_name}_${protocol}":
+      incl    => '/etc/services',
+      lens    => 'Services.lns',
+      changes => $augeas_operations
+    }
   }
 }
-
-# vim: tabstop=2 shiftwidth=2 softtabstop=2

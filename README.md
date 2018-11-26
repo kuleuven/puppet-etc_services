@@ -6,59 +6,58 @@
     * [What etc_services affects](#what-etc_services-affects)
     * [Setup requirements](#setup-requirements)
 4. [Usage - Configuration options and additional functionality](#usage)
-5. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
 5. [Limitations - OS compatibility, etc.](#limitations)
 6. [Development - Guide for contributing to the module](#development)
+7. [Contributors](#contributors)
 
 ## Overview
 
-Manage a single `/etc/services` entry.
+Adds a defined type which can manage a specific service name in `/etc/services`.
 
 ## Module Description
 
-Manage a single `/etc/services` entry.
+This module allows easy creation and removal of etc services entries via a new defined type. Each instance 
 
 ## Setup
 
 ### What etc_services affects
 
-* `/etc/services`
+Entries in the `/etc/services` file.
 
 ### Setup Requirements
 
-* [puppetlabs-stdlib](https://github.com/puppetlabs/puppetlabs-stdlib.git)
+Just declare an instance.
 
 ## Usage
 
-### Classes and Defined Types
-
-#### Defined Type: `etc_services`
-
-Manage `/etc/services` entries.
-
-Separator `/` is used between _service_name_ and _protocol_ and is *mandatory*.
-
-Example:
+The `etc_services` defined type allows a service to be instantiated with one or more port/protocol combinations.
 
 ```puppet
-::etc_services { 'kerberos/udp':
-  port    => '88',
-  aliases => [ 'kerberos5', 'krb5', 'kerberos-sec' ],
-  comment => 'Kerberos v5'
+etc_services { 'kerberos':
+  protocols => { 'udp' => '88' },
+  aliases   => [ 'kerberos5', 'krb5', 'kerberos-sec' ],
+  comment   => 'Kerberos v5'
 }
 ```
 
-## Reference
+The example above will generate a single entry in `/etc/services` similar to the following:
 
-### Defined Types
+```
+kerberos  88/udp  kerberos5 krb5 kerberos-sec # Kerberos v5
+```
 
-* [etc_services](#defined-type-etc_services-type-etc_services): Manage `/etc/services` entry.
+Note that the aliases and comment are entirely optional
 
 ## Limitations
 
-This module could be used on any operating systems that has support for augeas and uses `/etc/services` file.
+* This module could be used on any operating systems that has support for augeas and use the `/etc/services` file.
+* Only TCP and UDP protocols are supported!
 
 ## Development
 
 If you want to contribute or adjust some of the settings / behavior, either:
 * create a new _Pull Request_.
+
+## Contributors
+
+Check out the [contributor list](https://github.com/ccin2p3/puppet-etc_services/graphs/contributors).
