@@ -66,27 +66,87 @@ describe 'etc_services' do
       it { is_expected.to compile.with_all_deps }
 
       it {
-        is_expected.to contain_augeas('ntp_udp').with(
-          incl: '/etc/services',
-          lens: 'Services.lns',
-          changes: [
-            'defnode node service-name[.=\'ntp\'][protocol = \'udp\'] ntp',
-            'set $node/port 123',
-            'set $node/protocol udp',
-            'remove $node/alias',
-            'remove $node/#comment',
-          ],
+        is_expected.to contain_file_line('ntp_udp').with(
+          ensure: 'present',
+          path: '/etc/services',
+          line: 'ntp 123/udp',
+          match: '^ntp\s+\d+/udp',
         )
-        is_expected.to contain_augeas('ntp_tcp').with(
-          incl: '/etc/services',
-          lens: 'Services.lns',
-          changes: [
-            'defnode node service-name[.=\'ntp\'][protocol = \'tcp\'] ntp',
-            'set $node/port 123',
-            'set $node/protocol tcp',
-            'remove $node/alias',
-            'remove $node/#comment',
+        is_expected.to contain_file_line('ntp_tcp').with(
+          ensure: 'present',
+          path: '/etc/services',
+          line: 'ntp 123/tcp',
+          match: '^ntp\s+\d+/tcp',
+        )
+      }
+    end
+
+    context "on #{os} complete entry" do
+      let(:params) do
+        {
+          service_name: 'kerberos',
+          ensure: 'present',
+          protocols: {
+            udp: 88,
+            tcp: 88,
+          },
+          comment: 'Kerberos v5',
+          aliases: [
+            'kerberos5',
+            'krb5',
           ],
+        }
+      end
+
+      it { is_expected.to compile.with_all_deps }
+
+      it {
+        is_expected.to contain_file_line('kerberos_udp').with(
+          ensure: 'present',
+          path: '/etc/services',
+          line: 'kerberos 88/udp kerberos5 krb5 # Kerberos v5',
+          match: '^kerberos\s+\d+/udp',
+        )
+        is_expected.to contain_file_line('kerberos_tcp').with(
+          ensure: 'present',
+          path: '/etc/services',
+          line: 'kerberos 88/tcp kerberos5 krb5 # Kerberos v5',
+          match: '^kerberos\s+\d+/tcp',
+        )
+      }
+    end
+
+    context "on #{os} remove entry" do
+      let(:params) do
+        {
+          service_name: 'kerberos',
+          ensure: 'absent',
+          protocols: {
+            udp: 88,
+            tcp: 88,
+          },
+          comment: 'Kerberos v5',
+          aliases: [
+            'kerberos5',
+            'krb5',
+          ],
+        }
+      end
+
+      it { is_expected.to compile.with_all_deps }
+
+      it {
+        is_expected.to contain_file_line('kerberos_udp').with(
+          ensure: 'absent',
+          path: '/etc/services',
+          match: '^kerberos\s+\d+/udp',
+          match_for_absence: true,
+        )
+        is_expected.to contain_file_line('kerberos_tcp').with(
+          ensure: 'absent',
+          path: '/etc/services',
+          match: '^kerberos\s+\d+/tcp',
+          match_for_absence: true,
         )
       }
     end
@@ -106,16 +166,11 @@ describe 'etc_services' do
       it { is_expected.to compile.with_all_deps }
 
       it {
-        is_expected.to contain_augeas('db2c_db2inst1_tcp').with(
-          incl: '/etc/services',
-          lens: 'Services.lns',
-          changes: [
-            'defnode node service-name[.=\'db2c_db2inst1\'][protocol = \'tcp\'] db2c_db2inst1',
-            'set $node/port 50000',
-            'set $node/protocol tcp',
-            'remove $node/alias',
-            'remove $node/#comment',
-          ],
+        is_expected.to contain_file_line('db2c_db2inst1_tcp').with(
+          ensure: 'present',
+          path: '/etc/services',
+          line: 'db2c_db2inst1 50000/tcp',
+          match: '^db2c_db2inst1\s+\d+/tcp',
         )
       }
     end

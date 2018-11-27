@@ -58,39 +58,45 @@ define etc_services (
   # For each port/protocol combination
   $protocols.each | $protocol, $port | {
     if ($ensure == 'present') {
-      $augeas_alias_operations = prefix($aliases, 'set $node/alias[last()+1] ')
-      $augeas_pre_alias_operations = [
-        "defnode node service-name[.='${service_name}'][protocol = '${protocol}'] ${service_name}",
-        "set \$node/port ${port}",
-        "set \$node/protocol ${protocol}",
-        'remove $node/alias',
-        'remove $node/#comment'
-      ]
+      $entry_prefix = "${service_name} ${port}/${protocol}"
 
-      if empty($comment) {
-        $augeas_post_alias_operations = []
+      unless(empty($comment)) {
+        $entry_comment = "# ${comment}"
       } else {
-        $augeas_post_alias_operations = [
-          "set \$node/#comment '${comment}'"
-        ]
+        $entry_comment = undef
       }
 
-      $augeas_operations = flatten([
-        $augeas_pre_alias_operations,
-        $augeas_alias_operations,
-        $augeas_post_alias_operations
-      ])
+
+      unless(empty($aliases)) {
+        $entry_aliases = join($aliases, ' ')
+      } else {
+        $entry_aliases = undef
+      }
+
+      if $entry_aliases and $entry_comment {
+        $entry_line = "${entry_prefix} ${entry_aliases} ${entry_comment}"
+      } elsif $entry_aliases {
+        $entry_line = "${entry_prefix} ${entry_aliases}"
+      } elsif $entry_comment {
+        $entry_line = "${entry_prefix} ${entry_comment}"
+      } else {
+        $entry_line = $entry_prefix
+      }
+
+      file_line { "${service_name}_${protocol}":
+        ensure => present,
+        path   => '/etc/services',
+        line   => $entry_line,
+        match  => "^${service_name}\\s+\\d+/${protocol}",
+      }
     }
     else {
-      $augeas_operations = [
-        "remove service-name[.='${service_name}'][protocol = '${protocol}'] ${service_name}"
-      ]
-    }
-
-    augeas { "${service_name}_${protocol}":
-      incl    => '/etc/services',
-      lens    => 'Services.lns',
-      changes => $augeas_operations
+      file_line { "${service_name}_${protocol}":
+        ensure            => absent,
+        path              => '/etc/services',
+        match             => "^${service_name}\\s+\\d+/${protocol}",
+        match_for_absence => true,
+      }
     }
   }
 }
