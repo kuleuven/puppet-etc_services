@@ -73,3 +73,4 @@ EOM
   end
 end
 
+MetadataJsonLint.options.strict_license = false
