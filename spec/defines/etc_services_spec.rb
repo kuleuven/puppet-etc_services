@@ -90,5 +90,34 @@ describe 'etc_services' do
         )
       }
     end
+
+    context "on #{os} suppress syntax error" do
+      let(:params) do
+        {
+          service_name: 'db2c_db2inst1',
+          ensure: 'present',
+          enforce_syntax: false,
+          protocols: {
+            tcp: 50_000,
+          },
+        }
+      end
+
+      it { is_expected.to compile.with_all_deps }
+
+      it {
+        is_expected.to contain_augeas('db2c_db2inst1_tcp').with(
+          incl: '/etc/services',
+          lens: 'Services.lns',
+          changes: [
+            'defnode node service-name[.=\'db2c_db2inst1\'][protocol = \'tcp\'] db2c_db2inst1',
+            'set $node/port 50000',
+            'set $node/protocol tcp',
+            'remove $node/alias',
+            'remove $node/#comment',
+          ],
+        )
+      }
+    end
   end
 end

@@ -24,10 +24,18 @@ The following parameters are available in the `etc_services` defined type.
 Data type: `String`
 
 The name of the service in /etc/services. This is a namevar...
-Note that it must comply with the syntax laid out in
+Note that it should comply with the syntax laid out in
 [RFC 6335 Section 5.1](https://tools.ietf.org/html/rfc6335#section-5.1)
 
 Default value: $name
+
+##### `enforce_syntax`
+
+Data type: `Boolean`
+
+When set to true the syntax rules from RFC 6335 are enforced.
+
+Default value: `true`
 
 ##### `protocols`
 

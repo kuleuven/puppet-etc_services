@@ -7,8 +7,11 @@
 #
 # @param service_name [String]
 #   The name of the service in /etc/services. This is a namevar...
-#   Note that it must comply with the syntax laid out in 
+#   Note that it should comply with the syntax laid out in 
 #   [RFC 6335 Section 5.1](https://tools.ietf.org/html/rfc6335#section-5.1)
+#
+# @param enforce_syntax [Boolean]
+#   When set to true the syntax rules from RFC 6335 are enforced.
 #
 # @param protocols [Hash[Enum['tcp','udp'],Integer]]
 #   A hash mapping one or more protocols to their associated ports. This is
@@ -26,7 +29,8 @@
 #   Should the corresponding /etc/services entry/entries be present or absent?
 #
 define etc_services (
-  String  $service_name = $name,
+  String $service_name                       = $name,
+  Boolean $enforce_syntax                    = true,
   Enum['absent','present'] $ensure           = 'present',
   String $comment                            = '',
   Array[String] $aliases                     = [],
@@ -38,14 +42,16 @@ define etc_services (
   # Begins and ends with [A-Za-z0-9]
   # Includes only [A-Za-z0-9-]
   # No consecutive '-'
-  unless($service_name =~
-    /^(?=.{1,15}$)(?=[A-Za-z0-9])(?=[A-Za-z0-9-]*[A-Za-z0-9]$)(?!.*([-])\1)[A-Za-z0-9-]+$/) {
-    fail("etc_service: Invalid service name '${service_name}'")
-  }
-  $aliases.each | $alias | {
-    unless($alias =~
+  if $enforce_syntax {
+    unless($service_name =~
       /^(?=.{1,15}$)(?=[A-Za-z0-9])(?=[A-Za-z0-9-]*[A-Za-z0-9]$)(?!.*([-])\1)[A-Za-z0-9-]+$/) {
-      fail("etc_services: Invalid service alias '${alias}'")
+      fail("etc_service: Invalid service name '${service_name}'")
+    }
+    $aliases.each | $alias | {
+      unless($alias =~
+        /^(?=.{1,15}$)(?=[A-Za-z0-9])(?=[A-Za-z0-9-]*[A-Za-z0-9]$)(?!.*([-])\1)[A-Za-z0-9-]+$/) {
+        fail("etc_services: Invalid service alias '${alias}'")
+      }
     }
   }
 
