@@ -1,3 +1,7 @@
+# etc_services
+
+[![Build Status](https://travis-ci.com/ccin2p3/puppet-etc_services.png?branch=master)](https://travis-ci.com/ccin2p3/puppet-etc_services) [![Version](https://img.shields.io/puppetforge/v/ccin2p3/etc_services.svg)](https://forge.puppet.com/ccin2p3/etc_services)
+
 #### Table of Contents
 
 1. [Overview](#overview)
