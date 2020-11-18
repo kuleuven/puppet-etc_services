@@ -43,13 +43,11 @@ define etc_services (
   # Includes only [A-Za-z0-9-]
   # No consecutive '-'
   if $enforce_syntax {
-    unless($service_name =~
-      /^(?=.{1,15}$)(?=[A-Za-z0-9])(?=[A-Za-z0-9-]*[A-Za-z0-9]$)(?!.*([-])\1)[A-Za-z0-9-]+$/) {
+    unless($service_name =~ Etc_services::ServiceName) {
       fail("etc_service: Invalid service name '${service_name}'")
     }
     $aliases.each | $alias | {
-      unless($alias =~
-        /^(?=.{1,15}$)(?=[A-Za-z0-9])(?=[A-Za-z0-9-]*[A-Za-z0-9]$)(?!.*([-])\1)[A-Za-z0-9-]+$/) {
+      unless($alias =~ Etc_services::ServiceName) {
         fail("etc_services: Invalid service alias '${alias}'")
       }
     }
