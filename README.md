@@ -40,7 +40,7 @@ The `etc_services` defined type allows a service to be instantiated with one or 
 etc_services { 'kerberos':
   protocols => { 'udp' => '88' },
   aliases   => [ 'kerberos5', 'krb5', 'kerberos-sec' ],
-  comment   => 'Kerberos v5'
+  comment   => 'Kerberos v5',
 }
 ```
 
@@ -51,6 +51,36 @@ kerberos  88/udp  kerberos5 krb5 kerberos-sec # Kerberos v5
 ```
 
 Note that the aliases and comment are entirely optional
+
+### Conversion from 1.x.x Releases
+
+Starting at release 2.0.0 the syntax of each etc_services entry changed subtly. Instead of encoding the protocol in the resource name, the `port` parameter has been replaced with a hash of `protocols`. This allows a service to be defined for two ports using the same resource.
+
+**Version < 2.0.0**
+
+```puppet
+etc_services { 'printer\tcp':
+  port    => '515',
+  aliases => [ 'spooler' ],
+  comment => 'line printer spooler',
+}
+
+etc_services { 'printer\udp':
+  port    => '515',
+  aliases => [ 'spooler' ],
+  comment => 'line printer spooler',
+}
+```
+
+**Version >= 2.0.0**
+
+```puppet
+etc_services { 'printer':
+  protocol => { 'tcp' => '515', 'udp' => '515' },
+  aliases  => [ 'spooler' ],
+  comment  => 'line printer spooler',
+}
+```
 
 ## Limitations
 

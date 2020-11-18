@@ -14,6 +14,7 @@
 Copyright (c) IN2P3 Computing Centre, IN2P3, CNRS
 
 Contributor(s) : Remi Ferrand <remi.ferrand_at_cc(dot)in2p3(dot)fr>
+                 Phil DeMonaco <phil_at_demona(dot)co>
 
 #### Parameters
 
@@ -39,7 +40,7 @@ Default value: `true`
 
 ##### `protocols`
 
-Data type: `Hash[Enum['tcp','udp'],Integer]`
+Data type: `Etc_services::Protocols`
 
 A hash mapping one or more protocols to their associated ports. This is
 mandatory.
