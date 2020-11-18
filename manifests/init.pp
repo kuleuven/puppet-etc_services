@@ -2,6 +2,7 @@
 # Copyright (c) IN2P3 Computing Centre, IN2P3, CNRS
 #
 # Contributor(s) : Remi Ferrand <remi.ferrand_at_cc(dot)in2p3(dot)fr>
+#                  Phil DeMonaco <phil_at_demona(dot)co>
 #
 # @summary Manage a /etc/services entry uniquely identified by its name and protocol.
 #
@@ -29,12 +30,12 @@
 #   Should the corresponding /etc/services entry/entries be present or absent?
 #
 define etc_services (
-  String $service_name                       = $name,
-  Boolean $enforce_syntax                    = true,
-  Enum['absent','present'] $ensure           = 'present',
-  String $comment                            = '',
-  Array[String] $aliases                     = [],
-  Hash[Enum['tcp','udp'],Integer] $protocols = undef,
+  String $service_name               = $name,
+  Boolean $enforce_syntax            = true,
+  Enum['absent','present'] $ensure   = 'present',
+  String $comment                    = '',
+  Array[String] $aliases             = [],
+  Etc_services::Protocols $protocols = undef,
 )
 {
   # Validate the name per RFC 6335 section 5.1
