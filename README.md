@@ -5,14 +5,16 @@
 #### Table of Contents
 
 1. [Overview](#overview)
-2. [Module Description - What the module does and why it is useful](#module-description)
-3. [Setup - The basics of getting started with etc_services](#setup)
+1. [Module Description - What the module does and why it is useful](#module-description)
+1. [Setup - The basics of getting started with etc_services](#setup)
     * [What etc_services affects](#what-etc_services-affects)
     * [Setup requirements](#setup-requirements)
-4. [Usage - Configuration options and additional functionality](#usage)
-5. [Limitations - OS compatibility, etc.](#limitations)
-6. [Development - Guide for contributing to the module](#development)
-7. [Contributors](#contributors)
+1. [Usage](#usage)
+1. [Reference](#reference)
+  1. [Data Types](#data-types)
+1. [Limitations - OS compatibility, etc.](#limitations)
+1. [Development - Guide for contributing to the module](#development)
+1. [Contributors](#contributors)
 
 ## Overview
 
@@ -82,9 +84,35 @@ etc_services { 'printer':
 }
 ```
 
+## Reference
+
+See the [references](./REFERENCES.md) file.
+
+### Data Types
+
+#### `Etc_services::Protocols`
+
+A simple hash mapping udp, tcp, or both to specific ports.
+
+```yaml
+tcp: 88
+udp: 88
+```
+
+```puppet
+{
+  tcp => 88,
+  udp => 88,
+}
+```
+
+#### `Etc_services::ServiceName`
+
+Entries match the service naming standards laid out in [RFC 6335 section 5.1](https://tools.ietf.org/html/rfc6335#section-5.1).
+
 ## Limitations
 
-* This module could be used on any operating systems that has support for augeas and use the `/etc/services` file.
+* This module could be used on any operating systems that use the `/etc/services` file.
 * Only TCP and UDP protocols are supported!
 
 ## Development

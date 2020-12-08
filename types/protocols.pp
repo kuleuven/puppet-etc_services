@@ -3,5 +3,5 @@ type Etc_services::Protocols = Hash[
     'udp',
     'tcp',
   ],
-  Integer[1,65535],
+  Stdlib::Port,
 ]

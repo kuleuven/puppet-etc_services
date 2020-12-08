@@ -6,36 +6,36 @@
 #
 # @summary Manage a /etc/services entry uniquely identified by its name and protocol.
 #
-# @param service_name [String]
+# @param service_name
 #   The name of the service in /etc/services. This is a namevar...
 #   Note that it should comply with the syntax laid out in 
 #   [RFC 6335 Section 5.1](https://tools.ietf.org/html/rfc6335#section-5.1)
 #
-# @param enforce_syntax [Boolean]
+# @param enforce_syntax
 #   When set to true the syntax rules from RFC 6335 are enforced.
 #
-# @param protocols [Hash[Enum['tcp','udp'],Integer]]
+# @param protocols
 #   A hash mapping one or more protocols to their associated ports. This is
 #   mandatory.
 #
-# @param comment [String]
+# @param comment
 #   An optional comment to be appended to the end of each port/protocol
 #   specific line in /etc/services.
 #
-# @param aliases [Array[String]]
+# @param aliases
 #   An optional array of aliases which will be included for each port/protocol
 #   combination in /etc/services.
 #
-# @param ensure [Enum['absent','present']]
+# @param ensure
 #   Should the corresponding /etc/services entry/entries be present or absent?
 #
 define etc_services (
+  Etc_services::Protocols $protocols,
   String $service_name               = $name,
   Boolean $enforce_syntax            = true,
   Enum['absent','present'] $ensure   = 'present',
   String $comment                    = '',
   Array[String] $aliases             = [],
-  Etc_services::Protocols $protocols = undef,
 )
 {
   # Validate the name per RFC 6335 section 5.1

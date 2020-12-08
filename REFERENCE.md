@@ -45,8 +45,6 @@ Data type: `Etc_services::Protocols`
 A hash mapping one or more protocols to their associated ports. This is
 mandatory.
 
-Default value: `undef`
-
 ##### `comment`
 
 Data type: `String`
