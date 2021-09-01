@@ -10,7 +10,7 @@
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": "4.x"
+      "version_requirement": ">= 4.7.0 < 7.0.0"
     }
   ],
   "operatingsystem_support": [
@@ -33,7 +33,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 4.7.0 < 6.0.0"
+      "version_requirement": ">= 4.7.0 < 8.0.0"
     }
   ],
   "description": "Puppet module to easily manage /etc/services entries",
@@ -45,7 +45,7 @@
     "port",
     "ports"
   ],
-  "pdk-version": "1.18.1",
-  "template-url": "pdk-default#1.18.1",
-  "template-ref": "tags/1.18.1-0-g3d2e75c"
+  "pdk-version": "2.2.0",
+  "template-url": "pdk-default#2.2.0",
+  "template-ref": "tags/2.2.0-0-g2381db6"
 }
