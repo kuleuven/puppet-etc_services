@@ -1,0 +1,4 @@
+---
+Rakefile:
+  extras:
+    - "MetadataJsonLint.options.strict_license = false"
