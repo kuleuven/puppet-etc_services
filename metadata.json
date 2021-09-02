@@ -1,18 +1,16 @@
 {
   "name": "ccin2p3-etc_services",
-  "version": "1.1.1",
-  "source": "https://github.com/ccin2p3/puppet-etc_services",
+  "version": "2.0.0",
   "author": "IN2P3 Computing Centre",
-  "license": "CeCILL B",
   "summary": "CC-IN2P3 module for managing /etc/services entries",
-  "description": "Puppet module to easily manage /etc/services entries",
+  "license": "CECILL-B",
+  "source": "https://github.com/ccin2p3/puppet-etc_services",
   "project_page": "https://github.com/ccin2p3/puppet-etc_services",
   "issues_url": "https://github.com/ccin2p3/puppet-etc_services/issues",
-  "tags": ["/etc/services", "services", "etc_services", "etc", "port", "ports"],
   "dependencies": [
     {
       "name": "puppetlabs/stdlib",
-      "version_requirement": "4.x"
+      "version_requirement": ">= 4.7.0 < 7.0.0"
     }
   ],
   "operatingsystem_support": [
@@ -31,5 +29,23 @@
     {
       "operatingsystem": "Ubuntu"
     }
-  ]
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 4.7.0 < 8.0.0"
+    }
+  ],
+  "description": "Puppet module to easily manage /etc/services entries",
+  "tags": [
+    "/etc/services",
+    "services",
+    "etc_services",
+    "etc",
+    "port",
+    "ports"
+  ],
+  "pdk-version": "2.2.0",
+  "template-url": "pdk-default#2.2.0",
+  "template-ref": "tags/2.2.0-0-g2381db6"
 }

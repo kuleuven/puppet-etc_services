@@ -2,76 +2,100 @@
 # Copyright (c) IN2P3 Computing Centre, IN2P3, CNRS
 #
 # Contributor(s) : Remi Ferrand <remi.ferrand_at_cc(dot)in2p3(dot)fr>
+#                  Phil DeMonaco <phil_at_demona(dot)co>
 #
-
-# == Define: etc_services
+# @summary Manage a /etc/services entry uniquely identified by its name and protocol.
 #
-# Manage a /etc/services entry uniquely identified by its name and protocol.
+# @param service_name
+#   The name of the service in /etc/services. This is a namevar...
+#   Note that it should comply with the syntax laid out in 
+#   [RFC 6335 Section 5.1](https://tools.ietf.org/html/rfc6335#section-5.1)
 #
-# === Parameters
+# @param enforce_syntax
+#   When set to true the syntax rules from RFC 6335 are enforced.
 #
-# [*port*]
-#   /etc/services entry port. Required.
-# [*comment]
-#   /etc/services entry comment. Defaults to ''.
-# [*aliases*]
-#   /etc/services entry aliases specified as an array. Defaults to [].
-# [*ensure*]
-#   Should /etc/services entry be present or absent. Defaults to present.
+# @param protocols
+#   A hash mapping one or more protocols to their associated ports. This is
+#   mandatory.
+#
+# @param comment
+#   An optional comment to be appended to the end of each port/protocol
+#   specific line in /etc/services.
+#
+# @param aliases
+#   An optional array of aliases which will be included for each port/protocol
+#   combination in /etc/services.
+#
+# @param ensure
+#   Should the corresponding /etc/services entry/entries be present or absent?
 #
 define etc_services (
-  $port,
-  $comment = '',
-  $aliases = [],
-  $ensure = 'present'
+  Etc_services::Protocols $protocols,
+  String $service_name               = $name,
+  Boolean $enforce_syntax            = true,
+  Enum['absent','present'] $ensure   = 'present',
+  String $comment                    = '',
+  Array[String] $aliases             = [],
 )
 {
-  validate_re($name, '^[-\w]+/(tcp|udp)$')
-  validate_re($ensure, '^(absent|present)$')
-  validate_re($port, '^\d+$')
-  validate_array($aliases)
-  validate_string($comment)
-
-  $primary_keys = split($name, '/')
-  $service_name = $primary_keys[0]
-  $protocol = $primary_keys[1]
-
-  if ($ensure == 'present') {
-    $augeas_alias_operations = prefix($aliases, 'set $node/alias[last()+1] ')
-
-    $augeas_pre_alias_operations = [
-      "defnode node service-name[.='${service_name}'][protocol = '${protocol}'] ${service_name}",
-      "set \$node/port ${port}",
-      "set \$node/protocol ${protocol}",
-      'remove $node/alias',
-      'remove $node/#comment'
-    ]
-
-    if empty($comment) {
-      $augeas_post_alias_operations = []
-    } else {
-      $augeas_post_alias_operations = [
-        "set \$node/#comment '${comment}'"
-      ]
+  # Validate the name per RFC 6335 section 5.1
+  # 1-15 characters
+  # Begins and ends with [A-Za-z0-9]
+  # Includes only [A-Za-z0-9-]
+  # No consecutive '-'
+  if $enforce_syntax {
+    unless($service_name =~ Etc_services::ServiceName) {
+      fail("etc_service: Invalid service name '${service_name}'")
     }
-
-    $augeas_operations = flatten([
-      $augeas_pre_alias_operations,
-      $augeas_alias_operations,
-      $augeas_post_alias_operations
-    ])
-  }
-  else {
-    $augeas_operations = [
-      "remove service-name[.='${service_name}'][protocol = '${protocol}'] ${service_name}"
-    ]
+    $aliases.each | $alias | {
+      unless($alias =~ Etc_services::ServiceName) {
+        fail("etc_services: Invalid service alias '${alias}'")
+      }
+    }
   }
 
-  augeas { "${service_name}_${protocol}":
-    incl    => '/etc/services',
-    lens    => 'Services.lns',
-    changes => $augeas_operations
+  # For each port/protocol combination
+  $protocols.each | $protocol, $port | {
+    if ($ensure == 'present') {
+      $entry_prefix = "${service_name} ${port}/${protocol}"
+
+      unless(empty($comment)) {
+        $entry_comment = "# ${comment}"
+      } else {
+        $entry_comment = undef
+      }
+
+
+      unless(empty($aliases)) {
+        $entry_aliases = join($aliases, ' ')
+      } else {
+        $entry_aliases = undef
+      }
+
+      if $entry_aliases and $entry_comment {
+        $entry_line = "${entry_prefix} ${entry_aliases} ${entry_comment}"
+      } elsif $entry_aliases {
+        $entry_line = "${entry_prefix} ${entry_aliases}"
+      } elsif $entry_comment {
+        $entry_line = "${entry_prefix} ${entry_comment}"
+      } else {
+        $entry_line = $entry_prefix
+      }
+
+      file_line { "${service_name}_${protocol}":
+        ensure => present,
+        path   => '/etc/services',
+        line   => $entry_line,
+        match  => "^${service_name}\\s+\\d+/${protocol}",
+      }
+    }
+    else {
+      file_line { "${service_name}_${protocol}":
+        ensure            => absent,
+        path              => '/etc/services',
+        match             => "^${service_name}\\s+\\d+/${protocol}",
+        match_for_absence => true,
+      }
+    }
   }
 }
-
-# vim: tabstop=2 shiftwidth=2 softtabstop=2
