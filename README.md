@@ -78,7 +78,7 @@ etc_services { 'printer\udp':
 
 ```puppet
 etc_services { 'printer':
-  protocols => { 'tcp' => '515', 'udp' => '515' },
+  protocols => { 'tcp' => 515, 'udp' => 515 },
   aliases   => [ 'spooler' ],
   comment   => 'line printer spooler',
 }
