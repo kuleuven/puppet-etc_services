@@ -22,7 +22,7 @@ Adds a defined type which can manage a specific service name in `/etc/services`.
 
 ## Module Description
 
-This module allows easy creation and removal of etc services entries via a new defined type. Each instance 
+This module allows easy creation and removal of etc services entries via a new defined type. Each instance
 
 ## Setup
 
@@ -78,9 +78,9 @@ etc_services { 'printer\udp':
 
 ```puppet
 etc_services { 'printer':
-  protocol => { 'tcp' => '515', 'udp' => '515' },
-  aliases  => [ 'spooler' ],
-  comment  => 'line printer spooler',
+  protocols => { 'tcp' => '515', 'udp' => '515' },
+  aliases   => [ 'spooler' ],
+  comment   => 'line printer spooler',
 }
 ```
 
