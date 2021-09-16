@@ -1,6 +1,6 @@
 {
   "name": "ccin2p3-etc_services",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "author": "IN2P3 Computing Centre",
   "summary": "CC-IN2P3 module for managing /etc/services entries",
   "license": "CECILL-B",
